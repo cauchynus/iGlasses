@@ -18,10 +18,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
 import com.google.android.gms.vision.CameraSource;
+import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionPoint;
 import com.google.firebase.ml.vision.face.FirebaseVisionFace;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark;
@@ -49,9 +51,9 @@ public class FaceGraphic extends Graphic {
 
   private int facing;
 
-  private final Paint facePositionPaint;
-  private final Paint idPaint;
-  private final Paint boxPaint;
+  private Paint facePositionPaint;
+  private Paint idPaint;
+  private Paint boxPaint;
 
   private volatile FirebaseVisionFace firebaseVisionFace;
 
@@ -95,15 +97,15 @@ public class FaceGraphic extends Graphic {
     // Draws a circle at the position of the detected face, with the face's track id below.
     float x = translateX(face.getBoundingBox().centerX());
     float y = translateY(face.getBoundingBox().centerY());
-    canvas.drawCircle(x, y, FACE_POSITION_RADIUS, facePositionPaint);
-    canvas.drawText("id: " + face.getTrackingId(), x + ID_X_OFFSET, y + ID_Y_OFFSET, idPaint);
-    canvas.drawText(
+    //canvas.drawCircle(x, y, FACE_POSITION_RADIUS, facePositionPaint);
+    //canvas.drawText(" " + face.getTrackingId(), x + ID_X_OFFSET, y + ID_Y_OFFSET, idPaint);
+    /*canvas.drawText(
         "happiness: " + String.format("%.2f", face.getSmilingProbability()),
         x + ID_X_OFFSET * 3,
         y - ID_Y_OFFSET,
-        idPaint);
+        idPaint);*/
     if (facing == CameraSource.CAMERA_FACING_FRONT) {
-      canvas.drawText(
+      /*canvas.drawText(
           "right eye: " + String.format("%.2f", face.getRightEyeOpenProbability()),
           x - ID_X_OFFSET,
           y,
@@ -112,7 +114,7 @@ public class FaceGraphic extends Graphic {
           "left eye: " + String.format("%.2f", face.getLeftEyeOpenProbability()),
           x + ID_X_OFFSET * 6,
           y,
-          idPaint);
+          idPaint);*/
     } else {
       canvas.drawText(
           "left eye: " + String.format("%.2f", face.getLeftEyeOpenProbability()),
@@ -124,6 +126,7 @@ public class FaceGraphic extends Graphic {
           x + ID_X_OFFSET * 6,
           y,
           idPaint);
+
     }
 
     // Draws a bounding box around the face.
@@ -148,10 +151,10 @@ public class FaceGraphic extends Graphic {
     rectWidth = rectangle.width();
     rectHeight = rectangle.height();
     canvas.drawRect(rectangle, boxPaint);*/
-    canvas.drawRect(left, top, right, bottom, boxPaint);
+    //canvas.drawRect(left, top, right, bottom, boxPaint);
 
     // draw landmarks
-    drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.BOTTOM_MOUTH);
+    /*drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.BOTTOM_MOUTH);
     drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_CHEEK);
     drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_EAR);
     drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.LEFT_MOUTH);
@@ -160,8 +163,8 @@ public class FaceGraphic extends Graphic {
     drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_CHEEK);
     drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_EAR);
     //drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_EYE);
-    drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_MOUTH);
-    drawGlasses(canvas, face, FirebaseVisionFaceLandmark.LEFT_EYE);
+    drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_MOUTH);*/
+    drawGlasses(canvas, face, FirebaseVisionFaceLandmark.NOSE_BASE);
   }
 
   private void drawLandmarkPosition(Canvas canvas, FirebaseVisionFace face, int landmarkID) {
@@ -175,12 +178,19 @@ public class FaceGraphic extends Graphic {
     }
   }
   private void drawGlasses(Canvas canvas, FirebaseVisionFace face, int landmarkID) {
+    Matrix matrix = new Matrix();
+
     FirebaseVisionFaceLandmark landmark = face.getLandmark(landmarkID);
     if (landmark != null) {
       FirebaseVisionPoint point = landmark.getPosition();
-      Bitmap gafas = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.gafaspequescanvas200px);
-      Bitmap resized = Bitmap.createScaledBitmap(gafas, face.getBoundingBox().width(), face.getBoundingBox().height()/3, true);
-      canvas.drawBitmap( resized, translateX(point.getX())-200.0f, translateY(point.getY())-80.0f,null);
+      Bitmap gafas = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.blue_normal_op);
+      Bitmap resized = Bitmap.createScaledBitmap(gafas, face.getBoundingBox().width()-(face.getBoundingBox().width()/9), face.getBoundingBox().height()/3 - (face.getBoundingBox().height()/12) , true);
+      float centreX = (resized.getWidth()) /2;
+      float centreY = (resized.getHeight()) /2;
+
+      matrix.setRotate(face.getHeadEulerAngleZ());
+      Bitmap rotatedB= Bitmap.createBitmap(resized, 0, 0, resized.getWidth(), resized.getHeight() , matrix, true);
+      canvas.drawBitmap( rotatedB, translateX(point.getX() + 0.90f*centreX - face.getHeadEulerAngleZ() ), translateY(point.getY() - 2.25f*centreY - Math.abs(2*face.getHeadEulerAngleZ())),null);
     }
   }
 }

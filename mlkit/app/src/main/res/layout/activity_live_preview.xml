@@ -42,7 +42,7 @@
       android:layout_toEndOf="@id/firePreview"
       android:background="#000">
 
-      <!--<Spinner
+     <!--<Spinner
           android:id="@+id/spinner"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"

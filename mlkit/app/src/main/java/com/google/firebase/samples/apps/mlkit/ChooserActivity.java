@@ -61,17 +61,23 @@ public final class ChooserActivity extends AppCompatActivity
     setContentView(R.layout.activity_chooser);
 
     // Set up ListView and Adapter
-    ListView listView = (ListView) findViewById(R.id.test_activity_list_view);
+    //ListView listView = (ListView) findViewById(R.id.test_activity_list_view);
 
-    MyArrayAdapter adapter = new MyArrayAdapter(this, android.R.layout.simple_list_item_2, CLASSES);
-    adapter.setDescriptionIds(DESCRIPTION_IDS);
+    //MyArrayAdapter adapter = new MyArrayAdapter(this, android.R.layout.simple_list_item_2, CLASSES);
+    //adapter.setDescriptionIds(DESCRIPTION_IDS);
 
-    listView.setAdapter(adapter);
-    listView.setOnItemClickListener(this);
+    //listView.setAdapter(adapter);
+    //listView.setOnItemClickListener(this);
 
     if (!allPermissionsGranted()) {
       getRuntimePermissions();
     }
+    InitialToLive();
+  }
+
+  public void InitialToLive(){
+    Intent intent = new Intent(ChooserActivity.this, LivePreviewActivity.class);
+    startActivity(intent);
   }
 
   @Override
@@ -151,7 +157,7 @@ public final class ChooserActivity extends AppCompatActivity
             (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
         view = inflater.inflate(android.R.layout.simple_list_item_2, null);
       }
-
+//nombre chooser activity en la list view
       ((TextView) view.findViewById(android.R.id.text1)).setText(classes[position].getSimpleName());
       ((TextView) view.findViewById(android.R.id.text2)).setText(descriptionIds[position]);
 
