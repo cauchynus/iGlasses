@@ -13,9 +13,12 @@
 // limitations under the License.
 package com.google.firebase.samples.apps.mlkit;
 
+import com.google.firebase.ml.vision.face.FirebaseVisionFace;
+import com.google.firebase.samples.apps.mlkit.facedetection.FaceGraphic;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityCompat.OnRequestPermissionsResultCallback;
@@ -30,11 +33,11 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
-import android.widget.Spinner;
-import android.widget.ToggleButton;
+import android.widget.Toast;
 
 import com.google.android.gms.common.annotation.KeepName;
 import com.google.firebase.ml.common.FirebaseMLException;
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark;
 import com.google.firebase.samples.apps.mlkit.barcodescanning.BarcodeScanningProcessor;
 import com.google.firebase.samples.apps.mlkit.custommodel.CustomImageClassifierProcessor;
 import com.google.firebase.samples.apps.mlkit.facedetection.Adapter;
@@ -45,6 +48,7 @@ import com.google.firebase.samples.apps.mlkit.textrecognition.TextRecognitionPro
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /** Demo app showing the various features of ML Kit for Firebase. This class is used to
@@ -53,7 +57,7 @@ import java.util.List;
 public final class LivePreviewActivity extends AppCompatActivity
     implements OnRequestPermissionsResultCallback,
         OnItemSelectedListener,
-        CompoundButton.OnCheckedChangeListener {
+        CompoundButton.OnCheckedChangeListener{
   private static final String FACE_DETECTION = "Face Detection";
   private static final String TEXT_DETECTION = "Text Detection";
   private static final String BARCODE_DETECTION = "Barcode Detection";
@@ -67,9 +71,13 @@ public final class LivePreviewActivity extends AppCompatActivity
   private GraphicOverlay graphicOverlay;
   private String selectedModel = FACE_DETECTION;
 
+  private volatile FirebaseVisionFace firebaseVisionFace;
   private List<Glasses> glassesList = new ArrayList<>();
   private RecyclerView glassesRecyclerView;
   private Adapter glassesAdapter;
+  FaceGraphic fg = new FaceGraphic(graphicOverlay);
+
+
 
 
   @Override
@@ -78,6 +86,18 @@ public final class LivePreviewActivity extends AppCompatActivity
     Log.d(TAG, "onCreate");
 
     setContentView(R.layout.activity_live_preview);
+    buildRecycler();
+
+    glassesAdapter = new Adapter(glassesList, getApplicationContext(), new Adapter.OnItemClickListener() {
+      @Override
+      public void onItemClick(Glasses gafa) {
+        Log.i("click", "has clickeado");
+        int resID = gafa.productImage;
+        Log.i("Huevos", "h"+resID);
+        fg.drawMierda(resID);
+      }
+    });
+    glassesRecyclerView.setAdapter(glassesAdapter);
 
     preview = (CameraSourcePreview) findViewById(R.id.firePreview);
     if (preview == null) {
@@ -112,22 +132,28 @@ public final class LivePreviewActivity extends AppCompatActivity
       getRuntimePermissions();
     }
 
+
+    populateglassesList();
+
+  }
+
+  public void buildRecycler(){
+    Log.i("click", "has clickeado");
+    FirebaseVisionFace face = firebaseVisionFace;
     glassesRecyclerView = findViewById(R.id.idRecyclerViewHorizontalList);
     // add a divider after each item for more clarity
     glassesRecyclerView.addItemDecoration(new DividerItemDecoration(LivePreviewActivity.this, LinearLayoutManager.HORIZONTAL));
-    glassesAdapter = new Adapter(glassesList, getApplicationContext());
     LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(LivePreviewActivity.this, LinearLayoutManager.HORIZONTAL, false);
     glassesRecyclerView.setLayoutManager(horizontalLayoutManager);
-    glassesRecyclerView.setAdapter(glassesAdapter);
-    populateglassesList();
   }
 
   private void populateglassesList(){
-    Glasses redondas = new Glasses("Redondas", R.drawable.redondas);
-    Glasses blue_hawkers = new Glasses("Azules Hawkers", R.drawable.blue_normal_op);
-    Glasses black_hawkers = new Glasses("Hawkers negras", R.drawable.gafas_reales);
-    Glasses rayban_chulito = new Glasses("Rayban Chulo", R.drawable.rayban);
-    Glasses oculus = new Glasses("OculusRift", R.drawable.oculusrift);
+
+    Glasses redondas = new Glasses("R.drawable.redondas", R.drawable.redondas);
+    Glasses blue_hawkers = new Glasses("R.drawable.blue_normal_op", R.drawable.blue_normal_op);
+    Glasses black_hawkers = new Glasses("R.drawable.gafas_reales", R.drawable.gafas_reales);
+    Glasses rayban_chulito = new Glasses("R.drawable.rayban", R.drawable.rayban);
+    Glasses oculus = new Glasses("R.drawable.oculusrift", R.drawable.oculusrift);
     glassesList.add(redondas);
     glassesList.add(blue_hawkers);
     glassesList.add(black_hawkers);

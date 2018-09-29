@@ -14,6 +14,7 @@
 
 package com.google.firebase.samples.apps.mlkit.facedetection;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -21,6 +22,9 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.firebase.ml.vision.FirebaseVision;
@@ -29,6 +33,7 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFace;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark;
 import com.google.firebase.samples.apps.mlkit.GraphicOverlay;
 import com.google.firebase.samples.apps.mlkit.GraphicOverlay.Graphic;
+import com.google.firebase.samples.apps.mlkit.LivePreviewActivity;
 import com.google.firebase.samples.apps.mlkit.R;
 
 /**
@@ -54,6 +59,12 @@ public class FaceGraphic extends Graphic {
   private Paint facePositionPaint;
   private Paint idPaint;
   private Paint boxPaint;
+  public int idd=0;
+  public int idDraw;
+  private Canvas cv;
+  private Bitmap gafas;
+  private Bitmap rotatedB;
+  private Bitmap resized;
 
   private volatile FirebaseVisionFace firebaseVisionFace;
 
@@ -89,6 +100,7 @@ public class FaceGraphic extends Graphic {
   /** Draws the face annotations for position on the supplied canvas. */
   @Override
   public void draw(Canvas canvas) {
+
     FirebaseVisionFace face = firebaseVisionFace;
     if (face == null) {
       return;
@@ -164,8 +176,11 @@ public class FaceGraphic extends Graphic {
     drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_EAR);
     //drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_EYE);
     drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_MOUTH);*/
-    drawGlasses(canvas, face, FirebaseVisionFaceLandmark.NOSE_BASE);
+    cv=canvas;
+    drawGlasses(canvas, face, FirebaseVisionFaceLandmark.NOSE_BASE, idd);
+
   }
+
 
   private void drawLandmarkPosition(Canvas canvas, FirebaseVisionFace face, int landmarkID) {
     FirebaseVisionFaceLandmark landmark = face.getLandmark(landmarkID);
@@ -177,19 +192,31 @@ public class FaceGraphic extends Graphic {
               10f, idPaint);
     }
   }
-  private void drawGlasses(Canvas canvas, FirebaseVisionFace face, int landmarkID) {
+
+  public void drawMierda(int idGafas){
+    FirebaseVisionFace face = firebaseVisionFace;
+    idd=idGafas;
+    gafas=null;
+    resized=null;
+    rotatedB=null;
+    draw(cv);
+  }
+
+  public void drawGlasses(Canvas canvas, FirebaseVisionFace face, int landmarkID, int idDeloscojones) {
     Matrix matrix = new Matrix();
+    Log.i("drawGlas", "suu"+ idDeloscojones);
+
 
     FirebaseVisionFaceLandmark landmark = face.getLandmark(landmarkID);
-    if (landmark != null) {
+    if (landmark != null && idDeloscojones!=0) {
       FirebaseVisionPoint point = landmark.getPosition();
-      Bitmap gafas = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.rayban);
-      Bitmap resized = Bitmap.createScaledBitmap(gafas, face.getBoundingBox().width()-(face.getBoundingBox().width()/9), face.getBoundingBox().height()/3 - (face.getBoundingBox().height()/12) , true);
+      gafas = BitmapFactory.decodeResource(getApplicationContext().getResources(),idDeloscojones);
+      resized = Bitmap.createScaledBitmap(gafas, face.getBoundingBox().width()-(face.getBoundingBox().width()/9), face.getBoundingBox().height()/3 - (face.getBoundingBox().height()/12) , true);
       float centreX = (resized.getWidth()) /2;
       float centreY = (resized.getHeight()) /2;
 
       matrix.setRotate(face.getHeadEulerAngleZ());
-      Bitmap rotatedB= Bitmap.createBitmap(resized, 0, 0, resized.getWidth(), resized.getHeight() , matrix, true);
+      rotatedB= Bitmap.createBitmap(resized, 0, 0, resized.getWidth(), resized.getHeight() , matrix, true);
       canvas.drawBitmap( rotatedB, translateX(point.getX() + 0.90f*centreX - face.getHeadEulerAngleZ() ), translateY(point.getY() - 2.25f*centreY - Math.abs(2*face.getHeadEulerAngleZ())),null);
     }
   }
