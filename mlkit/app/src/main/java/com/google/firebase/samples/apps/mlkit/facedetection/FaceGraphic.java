@@ -183,7 +183,7 @@ public class FaceGraphic extends Graphic {
     FirebaseVisionFaceLandmark landmark = face.getLandmark(landmarkID);
     if (landmark != null) {
       FirebaseVisionPoint point = landmark.getPosition();
-      Bitmap gafas = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.blue_normal_op);
+      Bitmap gafas = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.rayban);
       Bitmap resized = Bitmap.createScaledBitmap(gafas, face.getBoundingBox().width()-(face.getBoundingBox().width()/9), face.getBoundingBox().height()/3 - (face.getBoundingBox().height()/12) , true);
       float centreX = (resized.getWidth()) /2;
       float centreY = (resized.getHeight()) /2;

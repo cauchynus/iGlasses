@@ -21,6 +21,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityCompat.OnRequestPermissionsResultCallback;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -34,7 +37,9 @@ import com.google.android.gms.common.annotation.KeepName;
 import com.google.firebase.ml.common.FirebaseMLException;
 import com.google.firebase.samples.apps.mlkit.barcodescanning.BarcodeScanningProcessor;
 import com.google.firebase.samples.apps.mlkit.custommodel.CustomImageClassifierProcessor;
+import com.google.firebase.samples.apps.mlkit.facedetection.Adapter;
 import com.google.firebase.samples.apps.mlkit.facedetection.FaceDetectionProcessor;
+import com.google.firebase.samples.apps.mlkit.facedetection.Objetos.Glasses;
 import com.google.firebase.samples.apps.mlkit.imagelabeling.ImageLabelingProcessor;
 import com.google.firebase.samples.apps.mlkit.textrecognition.TextRecognitionProcessor;
 
@@ -61,6 +66,11 @@ public final class LivePreviewActivity extends AppCompatActivity
   private CameraSourcePreview preview;
   private GraphicOverlay graphicOverlay;
   private String selectedModel = FACE_DETECTION;
+
+  private List<Glasses> glassesList = new ArrayList<>();
+  private RecyclerView glassesRecyclerView;
+  private Adapter glassesAdapter;
+
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -93,14 +103,37 @@ public final class LivePreviewActivity extends AppCompatActivity
     //spinner.setAdapter(dataAdapter);
     //spinner.setOnItemSelectedListener(this);
 
-    ToggleButton facingSwitch = (ToggleButton) findViewById(R.id.facingswitch);
-    facingSwitch.setOnCheckedChangeListener(this);
+    /*ToggleButton facingSwitch = (ToggleButton) findViewById(R.id.facingswitch);
+    facingSwitch.setOnCheckedChangeListener(this);*/
 
     if (allPermissionsGranted()) {
       createCameraSource(selectedModel);
     } else {
       getRuntimePermissions();
     }
+
+    glassesRecyclerView = findViewById(R.id.idRecyclerViewHorizontalList);
+    // add a divider after each item for more clarity
+    glassesRecyclerView.addItemDecoration(new DividerItemDecoration(LivePreviewActivity.this, LinearLayoutManager.HORIZONTAL));
+    glassesAdapter = new Adapter(glassesList, getApplicationContext());
+    LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(LivePreviewActivity.this, LinearLayoutManager.HORIZONTAL, false);
+    glassesRecyclerView.setLayoutManager(horizontalLayoutManager);
+    glassesRecyclerView.setAdapter(glassesAdapter);
+    populateglassesList();
+  }
+
+  private void populateglassesList(){
+    Glasses redondas = new Glasses("Redondas", R.drawable.redondas);
+    Glasses blue_hawkers = new Glasses("Azules Hawkers", R.drawable.blue_normal_op);
+    Glasses black_hawkers = new Glasses("Hawkers negras", R.drawable.gafas_reales);
+    Glasses rayban_chulito = new Glasses("Rayban Chulo", R.drawable.rayban);
+    Glasses oculus = new Glasses("OculusRift", R.drawable.oculusrift);
+    glassesList.add(redondas);
+    glassesList.add(blue_hawkers);
+    glassesList.add(black_hawkers);
+    glassesList.add(rayban_chulito);
+    glassesList.add(oculus);
+    glassesAdapter.notifyDataSetChanged();
   }
 
   @Override
