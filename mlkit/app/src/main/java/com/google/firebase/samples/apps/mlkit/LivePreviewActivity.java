@@ -149,11 +149,11 @@ public final class LivePreviewActivity extends AppCompatActivity
 
   private void populateglassesList(){
 
-    Glasses redondas = new Glasses("R.drawable.redondas", R.drawable.redondas);
-    Glasses blue_hawkers = new Glasses("R.drawable.blue_normal_op", R.drawable.blue_normal_op);
-    Glasses black_hawkers = new Glasses("R.drawable.gafas_reales", R.drawable.gafas_reales);
-    Glasses rayban_chulito = new Glasses("R.drawable.rayban", R.drawable.rayban);
-    Glasses oculus = new Glasses("R.drawable.oculusrift", R.drawable.oculusrift);
+    Glasses redondas = new Glasses("Redondas", R.drawable.redondas);
+    Glasses blue_hawkers = new Glasses("Azules", R.drawable.blue_normal_op);
+    Glasses black_hawkers = new Glasses("Negras", R.drawable.gafas_reales);
+    Glasses rayban_chulito = new Glasses("Rayban", R.drawable.rayban);
+    Glasses oculus = new Glasses("Oculusrift", R.drawable.oculusrift);
     glassesList.add(redondas);
     glassesList.add(blue_hawkers);
     glassesList.add(black_hawkers);
