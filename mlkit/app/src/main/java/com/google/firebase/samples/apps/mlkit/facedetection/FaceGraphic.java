@@ -59,12 +59,9 @@ public class FaceGraphic extends Graphic {
   private Paint facePositionPaint;
   private Paint idPaint;
   private Paint boxPaint;
-  public int idd=0;
+  int idd=0;
   public int idDraw;
   private Canvas cv;
-  private Bitmap gafas;
-  private Bitmap rotatedB;
-  private Bitmap resized;
 
   private volatile FirebaseVisionFace firebaseVisionFace;
 
@@ -176,8 +173,7 @@ public class FaceGraphic extends Graphic {
     drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_EAR);
     //drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_EYE);
     drawLandmarkPosition(canvas, face, FirebaseVisionFaceLandmark.RIGHT_MOUTH);*/
-    cv=canvas;
-    drawGlasses(canvas, face, FirebaseVisionFaceLandmark.NOSE_BASE, idd);
+    drawGlasses(canvas, face, FirebaseVisionFaceLandmark.NOSE_BASE);
 
   }
 
@@ -196,27 +192,23 @@ public class FaceGraphic extends Graphic {
   public void drawMierda(int idGafas){
     FirebaseVisionFace face = firebaseVisionFace;
     idd=idGafas;
-    gafas=null;
-    resized=null;
-    rotatedB=null;
+    Log.i("ids","-->"+idd);
     draw(cv);
   }
 
-  public void drawGlasses(Canvas canvas, FirebaseVisionFace face, int landmarkID, int idDeloscojones) {
+  public void drawGlasses(Canvas canvas, FirebaseVisionFace face, int landmarkID) {
     Matrix matrix = new Matrix();
-    Log.i("drawGlas", "suu"+ idDeloscojones);
-
 
     FirebaseVisionFaceLandmark landmark = face.getLandmark(landmarkID);
-    if (landmark != null && idDeloscojones!=0) {
+    if (landmark != null) {
       FirebaseVisionPoint point = landmark.getPosition();
-      gafas = BitmapFactory.decodeResource(getApplicationContext().getResources(),idDeloscojones);
-      resized = Bitmap.createScaledBitmap(gafas, face.getBoundingBox().width()-(face.getBoundingBox().width()/9), face.getBoundingBox().height()/3 - (face.getBoundingBox().height()/12) , true);
+      Bitmap gafas = BitmapFactory.decodeResource(getApplicationContext().getResources(),R.drawable.blue_normal_op);
+      Bitmap resized = Bitmap.createScaledBitmap(gafas, face.getBoundingBox().width()-(face.getBoundingBox().width()/9), face.getBoundingBox().height()/3 - (face.getBoundingBox().height()/12) , true);
       float centreX = (resized.getWidth()) /2;
       float centreY = (resized.getHeight()) /2;
 
       matrix.setRotate(face.getHeadEulerAngleZ());
-      rotatedB= Bitmap.createBitmap(resized, 0, 0, resized.getWidth(), resized.getHeight() , matrix, true);
+      Bitmap rotatedB= Bitmap.createBitmap(resized, 0, 0, resized.getWidth(), resized.getHeight() , matrix, true);
       canvas.drawBitmap( rotatedB, translateX(point.getX() + 0.90f*centreX - face.getHeadEulerAngleZ() ), translateY(point.getY() - 2.25f*centreY - Math.abs(2*face.getHeadEulerAngleZ())),null);
     }
   }

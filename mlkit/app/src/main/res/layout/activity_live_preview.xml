@@ -58,13 +58,6 @@
 
         </android.support.v7.widget.RecyclerView>
 
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/button_background"
-            android:text="FOTO" />
         <!--<ToggleButton
           android:id="@+id/facingswitch"
           android:layout_width="48dp"
